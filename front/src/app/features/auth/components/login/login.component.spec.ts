@@ -1,3 +1,4 @@
+// Import necessary Angular testing modules and utilities
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -18,54 +19,58 @@ describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let authService: AuthService;
 
-  // On crée un mock pour AuthService avec une méthode login simulée.
+  // Mock implementation of AuthService with a fake login response
   const authServiceMock = {
     login: jest.fn().mockReturnValue(of({ token: 'fake-token' }))
   };
 
   beforeEach(async () => {
+    // Configure the testing module with component and all dependencies
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [{ provide: AuthService, useValue: authServiceMock }],
+      providers: [
+        { provide: AuthService, useValue: authServiceMock }
+      ],
       imports: [
-        RouterTestingModule,
-        BrowserAnimationsModule,
-        HttpClientModule,
-        MatCardModule,
-        MatIconModule,
-        MatFormFieldModule,
-        MatInputModule,
-        ReactiveFormsModule
+        RouterTestingModule,          
+        BrowserAnimationsModule,      
+        HttpClientModule,             
+        MatCardModule,                
+        MatIconModule,                
+        MatFormFieldModule,           
+        MatInputModule,               
+        ReactiveFormsModule           
       ]
     }).compileComponents();
 
+    // Create component fixture and instance
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService);
     fixture.detectChanges();
   });
 
+  // Simple test to ensure the component compiles and renders correctly
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  // Ensure that the submit button is disabled when the form is invalid
   it('should disable submit button when form is invalid', () => {
-    // Au démarrage, le formulaire est vide donc invalide.
     const compiled = fixture.nativeElement;
     const submitButton = compiled.querySelector('button[type="submit"]');
     expect(submitButton.disabled).toBeTruthy();
   });
 
+  // Simulate a valid form submission and check if AuthService.login is called correctly
   it('should call authService.login when form is valid and submitted', () => {
-    // Remplir le formulaire via "form" car le template utilise [formGroup]="form"
     component.form.controls['email'].setValue('yoga@studio.com');
     component.form.controls['password'].setValue('test!1234');
     fixture.detectChanges();
 
-    // Simuler la soumission en appelant la méthode "submit()"
     component.submit();
 
-    // Vérifier que la méthode login a été appelée avec les bonnes valeurs.
+    // Check if AuthService.login was called with the correct payload
     expect(authService.login).toHaveBeenCalledWith({
       email: 'yoga@studio.com',
       password: 'test!1234'

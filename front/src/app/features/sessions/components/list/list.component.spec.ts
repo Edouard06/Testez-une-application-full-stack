@@ -13,12 +13,10 @@ describe('ListComponent - Minimal', () => {
   let component: ListComponent;
   let fixture: ComponentFixture<ListComponent>;
 
-  // Mock minimal pour SessionService.
   const mockSessionService = {
     sessionInformation: { admin: true }
   };
 
-  // Dummy sessions conformes à l'interface Session.
   const dummySessions = [
     {
       id: 1,
@@ -49,10 +47,8 @@ describe('ListComponent - Minimal', () => {
     fixture = TestBed.createComponent(ListComponent);
     component = fixture.componentInstance;
 
-    // Définir la propriété read-only "user" via Object.defineProperty.
     Object.defineProperty(component, 'user', { value: { admin: true } });
 
-    // Simuler l'observable des sessions.
     component.sessions$ = of(dummySessions);
     fixture.detectChanges();
   }));
@@ -84,7 +80,6 @@ describe('ListComponent - Minimal', () => {
     dummySessions.forEach((session, index) => {
       const card = sessionCards[index];
       expect(card.textContent ?? '').toContain(session.name);
-      // Utiliser un format de date long en en-US pour correspondre au pipe 'longDate'
       const expectedDate = session.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       expect(card.textContent ?? '').toContain(expectedDate);
       expect(card.textContent ?? '').toContain(session.description);

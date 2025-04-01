@@ -16,7 +16,6 @@ import { FormComponent } from './form.component';
 import { SessionService } from 'src/app/services/session.service';
 import { SessionApiService } from '../../services/session-api.service';
 
-// Utiliser un service API mock pour éviter les appels réels.
 class MockSessionApiService {
   create(session: any) {
     return of({ id: 123, ...session });
@@ -30,7 +29,6 @@ describe('FormComponent - Minimal', () => {
   let component: FormComponent;
   let fixture: ComponentFixture<FormComponent>;
 
-  // Mock minimal pour SessionService.
   const mockSessionService = {
     sessionInformation: { admin: true }
   };
@@ -53,10 +51,8 @@ describe('FormComponent - Minimal', () => {
         { provide: SessionApiService, useClass: MockSessionApiService }
       ],
       declarations: [FormComponent],
-      // Ignore les erreurs liées aux composants inconnus dans le template.
       schemas: [NO_ERRORS_SCHEMA]
     })
-    // Remplacer le template par un template minimal.
     .overrideTemplate(FormComponent, `
       <form [formGroup]="sessionForm" (ngSubmit)="submit()">
         <button type="submit" [disabled]="sessionForm.invalid">Save</button>
@@ -66,7 +62,6 @@ describe('FormComponent - Minimal', () => {
 
     fixture = TestBed.createComponent(FormComponent);
     component = fixture.componentInstance;
-    // Assurer l'initialisation du formulaire.
     if (!component.sessionForm) {
       component.ngOnInit();
     }

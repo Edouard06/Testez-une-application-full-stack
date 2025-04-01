@@ -39,7 +39,6 @@ describe('RegisterComponent', () => {
   });
 
   it('should have a form with 4 controls (firstName, lastName, email, password)', () => {
-    // Vérifie que le formulaire contient bien les contrôles attendus.
     expect(component.form.contains('firstName')).toBeTruthy();
     expect(component.form.contains('lastName')).toBeTruthy();
     expect(component.form.contains('email')).toBeTruthy();
@@ -53,14 +52,12 @@ describe('RegisterComponent', () => {
   });
 
   it('should disable submit button if form is invalid', () => {
-    // Le formulaire est initialement vide et invalide.
     fixture.detectChanges();
     const submitButton = fixture.debugElement.query(By.css('button[type="submit"]')).nativeElement;
     expect(submitButton.disabled).toBeTruthy();
   });
 
   it('should enable submit button when form is valid', () => {
-    // Remplit tous les contrôles avec des valeurs valides.
     component.form.get('firstName')?.setValue('John');
     component.form.get('lastName')?.setValue('Doe');
     component.form.get('email')?.setValue('john.doe@example.com');
@@ -73,7 +70,6 @@ describe('RegisterComponent', () => {
   });
 
   it('should display error message when onError is true', () => {
-    // Active la propriété onError et vérifie que le message d'erreur s'affiche.
     component.onError = true;
     fixture.detectChanges();
     const errorElem = fixture.debugElement.query(By.css('.error'));
@@ -82,16 +78,13 @@ describe('RegisterComponent', () => {
   });
 
   it('should call submit() method when form is submitted', () => {
-    // Espionne la méthode submit pour vérifier qu'elle est appelée lors de la soumission.
     jest.spyOn(component, 'submit');
-    // Remplit le formulaire avec des valeurs valides.
     component.form.get('firstName')?.setValue('Jane');
     component.form.get('lastName')?.setValue('Doe');
     component.form.get('email')?.setValue('jane.doe@example.com');
     component.form.get('password')?.setValue('Password123!');
     fixture.detectChanges();
 
-    // Simule la soumission du formulaire.
     const formElem = fixture.debugElement.query(By.css('form'));
     formElem.triggerEventHandler('ngSubmit', null);
     expect(component.submit).toHaveBeenCalled();
