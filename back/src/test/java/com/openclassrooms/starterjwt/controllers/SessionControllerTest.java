@@ -182,5 +182,14 @@ class SessionControllerTest {
         ResponseEntity<?> response = controller.noLongerParticipate(sessionId.toString(), userId.toString());
 
         verify(sessionService).noLongerParticipate(sessionId, userId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testNoLongerParticipate_BadRequest() {
+        SessionController controller = new SessionController(sessionService, sessionMapper);
+        ResponseEntity<?> response = controller.noLongerParticipate("fake", "user");
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }
