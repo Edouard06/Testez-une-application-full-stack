@@ -1,4 +1,4 @@
-package services;
+package com.openclassrooms.starterjwt.services;
 
 
 import com.openclassrooms.starterjwt.models.Teacher;
