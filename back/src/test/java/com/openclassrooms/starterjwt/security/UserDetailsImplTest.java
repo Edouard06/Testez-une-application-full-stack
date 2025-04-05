@@ -15,82 +15,53 @@ public class UserDetailsImplTest {
 
     @BeforeEach
     public void setUp() {
-        // Initialize the UserDetailsImpl object before each test
+        // Initialize UserDetailsImpl with all required properties
         userDetails = UserDetailsImpl.builder()
                 .id(1L)
                 .username("testUser")
                 .firstName("Michel")
                 .lastName("Michel")
-                .admin(true)
                 .password("cProgrammation")
+                .admin(true)
                 .build();
     }
 
     @Test
-    public void testGetAuthorities() {
-        // Execution: call the getAuthorities() method
+    public void testGetAuthorities_ShouldReturnEmpty() {
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-
-        // Verification: ensure the returned collection is not null
         assertNotNull(authorities);
-        assertTrue(authorities.isEmpty());  // In this case, we expect the collection to be empty
+        assertTrue(authorities.isEmpty(), "Authorities list should be empty by default");
     }
 
     @Test
-    public void testIsAccountNonExpired() {
-        // Execution: call the isAccountNonExpired() method
-        boolean isAccountNonExpired = userDetails.isAccountNonExpired();
-
-        // Verification: ensure the account is not expired
-        assertTrue(isAccountNonExpired);
+    public void testIsAccountNonExpired_ShouldReturnTrue() {
+        assertTrue(userDetails.isAccountNonExpired(), "Account should be non-expired");
     }
 
     @Test
-    public void testIsAccountNonLocked() {
-        // Execution: call the isAccountNonLocked() method
-        boolean isAccountNonLocked = userDetails.isAccountNonLocked();
-
-        // Verification: ensure the account is not locked
-        assertTrue(isAccountNonLocked);
+    public void testIsAccountNonLocked_ShouldReturnTrue() {
+        assertTrue(userDetails.isAccountNonLocked(), "Account should be non-locked");
     }
 
     @Test
-    public void testIsCredentialsNonExpired() {
-        // Execution: call the isCredentialsNonExpired() method
-        boolean isCredentialsNonExpired = userDetails.isCredentialsNonExpired();
-
-        // Verification: ensure the credentials are not expired
-        assertTrue(isCredentialsNonExpired);
+    public void testIsCredentialsNonExpired_ShouldReturnTrue() {
+        assertTrue(userDetails.isCredentialsNonExpired(), "Credentials should be non-expired");
     }
 
     @Test
-    public void testIsEnabled() {
-        // Execution: call the isEnabled() method
-        boolean isEnabled = userDetails.isEnabled();
-
-        // Verification: ensure the account is enabled
-        assertTrue(isEnabled);
+    public void testIsEnabled_ShouldReturnTrue() {
+        assertTrue(userDetails.isEnabled(), "Account should be enabled");
     }
 
     @Test
-    public void testEqualsSameObject() {
-        // Prepare: create another UserDetailsImpl object with the same ID
-        UserDetailsImpl sameUserDetails = UserDetailsImpl.builder()
-                .id(1L)
-                .build();
-
-        // Verification: ensure both objects are equal
-        assertEquals(userDetails, sameUserDetails);
+    public void testEquals_WithSameId_ShouldReturnTrue() {
+        UserDetailsImpl anotherUser = UserDetailsImpl.builder().id(1L).build();
+        assertEquals(userDetails, anotherUser, "Users with the same ID should be equal");
     }
 
     @Test
-    public void testEqualsDifferentObject() {
-        // Prepare: create another UserDetailsImpl object with a different ID
-        UserDetailsImpl differentUserDetails = UserDetailsImpl.builder()
-                .id(2L)
-                .build();
-
-        // Verification: ensure both objects are not equal
-        assertNotEquals(userDetails, differentUserDetails);
+    public void testEquals_WithDifferentId_ShouldReturnFalse() {
+        UserDetailsImpl anotherUser = UserDetailsImpl.builder().id(2L).build();
+        assertNotEquals(userDetails, anotherUser, "Users with different IDs should not be equal");
     }
 }
