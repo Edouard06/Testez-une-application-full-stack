@@ -23,23 +23,20 @@ public class DetailsUserServiceTest {
 
     @Test
     void testLoadUserByUsername_ShouldReturnUserDetails() {
-        // Given
         User user = User.builder()
                 .id(1L)
                 .email("test@mail.com")
                 .password("password")
-                .firstName("Arthur")
-                .lastName("Pierre")
+                .firstName("Jacques")
+                .lastName("Henry")
                 .build();
 
         when(userRepository.findByEmail("test@mail.com")).thenReturn(Optional.of(user));
 
         UserDetailsServiceImpl service = new UserDetailsServiceImpl(userRepository);
 
-        // When
         UserDetails userDetails = service.loadUserByUsername("test@mail.com");
 
-        // Then
         assertNotNull(userDetails);
         assertEquals(user.getEmail(), userDetails.getUsername());
         assertEquals(user.getPassword(), userDetails.getPassword());

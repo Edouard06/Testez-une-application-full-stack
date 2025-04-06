@@ -1,4 +1,4 @@
-package com.openclassrooms.starterjwt.security;
+package com.openclassrooms.starterjwt.security.services;
 
 import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ public class UserDetailsImplTest {
 
     @BeforeEach
     public void setUp() {
-        // Initialize UserDetailsImpl with all required properties
         userDetails = UserDetailsImpl.builder()
                 .id(1L)
                 .username("testUser")
