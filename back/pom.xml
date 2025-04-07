@@ -110,7 +110,7 @@
                         </goals>
                         <configuration>
                             <excludes>
-                             <exclude>com/openclassrooms/starterjwt/dto/*</exclude> 
+                                <exclude>**/dto/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -125,14 +125,14 @@
                                 <rule>
                                     <element>CLASS</element>
                                     <excludes>
-                                        <exclude>com/openclassrooms/starterjwt/dto/*</exclude>
+                                        <exclude>**/dto/**</exclude>
                                     </excludes>
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
                                             <minimum>0</minimum>
-                                       </limit>
+                                        </limit>
                                     </limits>
                                 </rule>
                             </rules>
