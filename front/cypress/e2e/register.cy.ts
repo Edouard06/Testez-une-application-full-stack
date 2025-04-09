@@ -1,40 +1,55 @@
-describe('RegisterTestSuites', () => {
-    it('Register successfull', () => {
-        cy.visit('/register')
-    
-        cy.intercept('POST', '/api/auth/register', {
-            body: {
-              firstName: 'Iso',
-              lastName: 'Yoda',
-              email: 'yoda@gmail.com',
-              password: 'azerty'
-            },
-          })
-    
-          cy.get('input[formControlName=email]').type("mario@gmail.com")
-          cy.get('input[formControlName=firstName]').type("Mario")
-          cy.get('input[formControlName=lastName]').type("Mario")
-          cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+describe('Register Spec', () => {
+  it('Registration successfull', () => {
+      cy.visit('/register');
+
+      cy.intercept('POST', 'api/auth/register', { statusCode: 200 });
+
+      cy.get('input[formControlName=firstName]').type("tot");
+      cy.get('input[formControlName=lastName]').type("TOt");
+      cy.get('input[formControlName=email]').type("t@t.com");
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`);
+
+      cy.url().should('include', '/login');
+  });
+
+  it('Registration failure', () => {
+      cy.visit('/register');
+
+      cy.get('input[formControlName=firstName]').type("tot");
+      cy.get('input[formControlName=lastName]').type("TOt");
+      cy.get('input[formControlName=email]').type("t@t.com");
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`);
       
-          cy.url().should('include', '/login')
+      cy.url().should('include', '/register');
+      cy.get('.error').should('be.visible');
+  })
+
+  it('Registration failure : email already in use', () => {
+      cy.visit('/register');
+
+      cy.intercept('POST', 'api/auth/register', { statusCode: 400 });
+
+      cy.get('input[formControlName=firstName]').type("tot");
+      cy.get('input[formControlName=lastName]').type("TOt");
+      cy.get('input[formControlName=email]').type("t@t.com");
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`);
       
-    });
-    
-    it('Register unsuccessfull', () => {
-      cy.visit('/register')
-    
-      cy.intercept('POST', '/api/auth/register', {
-        statusCode: 404,
-        body: 'Not Found',
-      }).as('apiRequest');
-    
-        cy.get('input[formControlName=email]').type("mario@gmail.com")
-        cy.get('input[formControlName=firstName]').type("Mario")
-        cy.get('input[formControlName=lastName]').type("Mario")
-        cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
-    
-        cy.get('.error').should('be.visible');
-    
-    });
-    
-    });
+      cy.url().should('include', '/register');
+      cy.get('.error').should('be.visible');
+  })
+
+  
+  it('Registration failure : field is empty', () => {
+      cy.visit('/register');
+
+      cy.intercept('POST', 'api/auth/register', { statusCode: 400 });
+
+      cy.get('input[formControlName=firstName]').type("tot");
+      cy.get('input[formControlName=email]').type("t@t.com");
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`);
+      
+      cy.url().should('include', '/register');
+      cy.get('.error').should('not.be.exist');
+      cy.get('button[type=submit]').should('be.disabled');
+  })
+});

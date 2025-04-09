@@ -145,10 +145,10 @@
 				<configuration>
 					<excludes>
 						<exclude>**/dto/**</exclude>
-						<exclude>**/models/**</exclude>
+						<!-- <exclude>**/models/**</exclude>
 						<exclude>**/mapper/**</exclude>
 						<exclude>**/payload/**</exclude>
-						<exclude>**/security/**</exclude>
+						<exclude>**/security/**</exclude> -->
 					</excludes>
 				</configuration>
 
