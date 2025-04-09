@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { expect, jest } from '@jest/globals';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { SessionService } from '../../../../services/session.service';
@@ -72,7 +73,8 @@ describe('DetailComponent (Jest)', () => {
         { provide: TeacherService, useValue: mockTeacherService },
         { provide: MatSnackBar, useValue: mockSnackBar },
         { provide: Router, useValue: mockRouter }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] 
     }).compileComponents();
 
     fixture = TestBed.createComponent(DetailComponent);
@@ -92,7 +94,7 @@ describe('DetailComponent (Jest)', () => {
     expect(mockTeacherService.detail).toHaveBeenCalledWith('10');
     expect(component.session).toEqual(mockSession);
     expect(component.teacher).toEqual(mockTeacher);
-    expect(component.isParticipate).toBe(true); // ID 1 est dans users
+    expect(component.isParticipate).toBe(true);
   }));
 
   it('should call back() and trigger window.history.back', () => {

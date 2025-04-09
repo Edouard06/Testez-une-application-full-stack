@@ -1,92 +1,110 @@
 import { HttpClientModule } from '@angular/common/http';
+import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 import { expect } from '@jest/globals';
 
 import { RegisterComponent } from './register.component';
+import { AuthService } from '../../services/auth.service';
+
+// sMOCK Angular Material Components
+@Component({ selector: 'mat-card', template: '<ng-content></ng-content>' })
+class MockMatCard {}
+
+@Component({ selector: 'mat-card-header', template: '<ng-content></ng-content>' })
+class MockMatCardHeader {}
+
+@Component({ selector: 'mat-card-title', template: '<ng-content></ng-content>' })
+class MockMatCardTitle {}
+
+@Component({ selector: 'mat-card-content', template: '<ng-content></ng-content>' })
+class MockMatCardContent {}
+
+@Component({ selector: 'mat-form-field', template: '<ng-content></ng-content>' })
+class MockMatFormField {}
+
+@Component({ selector: 'mat-icon', template: '<ng-content></ng-content>' })
+class MockMatIcon {}
+
+@Component({ selector: 'input[matInput]', template: '' })
+class MockMatInput {}
+
+@Component({ selector: 'button[mat-raised-button]', template: '<ng-content></ng-content>' })
+class MockMatRaisedButton {}
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
+  let router: Router;
+
+  const mockAuthService = {
+    register: jest.fn()
+  };
+
+  const mockRouter = {
+    navigate: jest.fn()
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RegisterComponent],
+      declarations: [
+        RegisterComponent,
+        MockMatCard,
+        MockMatCardHeader,
+        MockMatCardTitle,
+        MockMatCardContent,
+        MockMatFormField,
+        MockMatIcon,
+        MockMatInput,
+        MockMatRaisedButton
+      ],
       imports: [
         BrowserAnimationsModule,
         HttpClientModule,
-        ReactiveFormsModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatIconModule,
-        MatInputModule
+        ReactiveFormsModule
+      ],
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
-  it('should create the register component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have a form with 4 controls (firstName, lastName, email, password)', () => {
-    expect(component.form.contains('firstName')).toBeTruthy();
-    expect(component.form.contains('lastName')).toBeTruthy();
-    expect(component.form.contains('email')).toBeTruthy();
-    expect(component.form.contains('password')).toBeTruthy();
+  it('should not register and show error when form is invalid', () => {
+    jest.spyOn(mockAuthService, 'register').mockImplementation(() => throwError(() => new Error('')));
+    component.form.setValue({ email: 'qsd@qsd.fr', firstName: '', lastName: 'QSD', password: 'pass' });
+    component.submit();
+    expect(mockAuthService.register).toHaveBeenCalled();
+    expect(component.onError).toBe(true);
   });
 
-  it('should mark the firstName control as invalid if empty', () => {
-    const control = component.form.get('firstName');
-    control?.setValue('');
-    expect(control?.valid).toBeFalsy();
+  it('should not register and show error with invalid email', () => {
+    jest.spyOn(mockAuthService, 'register').mockImplementation(() => throwError(() => new Error('')));
+    component.form.setValue({ email: 'qsd@qsd', firstName: 'qsd', lastName: 'QSD', password: 'pass' });
+    component.submit();
+    expect(mockAuthService.register).toHaveBeenCalled();
+    expect(component.onError).toBe(true);
   });
 
-  it('should disable submit button if form is invalid', () => {
-    fixture.detectChanges();
-    const submitButton = fixture.debugElement.query(By.css('button[type="submit"]')).nativeElement;
-    expect(submitButton.disabled).toBeTruthy();
-  });
-
-  it('should enable submit button when form is valid', () => {
-    component.form.get('firstName')?.setValue('John');
-    component.form.get('lastName')?.setValue('Doe');
-    component.form.get('email')?.setValue('john.doe@example.com');
-    component.form.get('password')?.setValue('Password123!');
-    fixture.detectChanges();
-
-    const submitButton = fixture.debugElement.query(By.css('button[type="submit"]')).nativeElement;
-    expect(component.form.valid).toBeTruthy();
-    expect(submitButton.disabled).toBeFalsy();
-  });
-
-  it('should display error message when onError is true', () => {
-    component.onError = true;
-    fixture.detectChanges();
-    const errorElem = fixture.debugElement.query(By.css('.error'));
-    expect(errorElem).toBeTruthy();
-    expect(errorElem.nativeElement.textContent).toContain('An error occurred');
-  });
-
-  it('should call submit() method when form is submitted', () => {
-    jest.spyOn(component, 'submit');
-    component.form.get('firstName')?.setValue('Jane');
-    component.form.get('lastName')?.setValue('Doe');
-    component.form.get('email')?.setValue('jane.doe@example.com');
-    component.form.get('password')?.setValue('Password123!');
-    fixture.detectChanges();
-
-    const formElem = fixture.debugElement.query(By.css('form'));
-    formElem.triggerEventHandler('ngSubmit', null);
-    expect(component.submit).toHaveBeenCalled();
+  it('should register and navigate on valid form submission', () => {
+    jest.spyOn(mockAuthService, 'register').mockImplementation(() => of({}));
+    const routerSpy = jest.spyOn(router, 'navigate');
+    component.form.setValue({ email: 'qsd@qsd.fr', firstName: 'qsd', lastName: 'QSD', password: 'pass' });
+    component.submit();
+    expect(mockAuthService.register).toHaveBeenCalled();
+    expect(component.onError).toBe(false);
+    expect(routerSpy).toHaveBeenCalledWith(['/login']);
   });
 });

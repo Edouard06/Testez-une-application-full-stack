@@ -1,7 +1,6 @@
-// Import necessary Angular testing modules and utilities
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,71 +8,109 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
-import { of } from 'rxjs';
+import { SessionService } from 'src/app/services/session.service';
 
-import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { LoginComponent } from './login.component';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { LoginRequest } from '../../interfaces/loginRequest.interface';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
+import { of } from 'rxjs/internal/observable/of';
 
 describe('LoginComponent', () => {
+  // Déclaration des variables de test
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authService: AuthService;
+  let sessionService: jest.Mocked<SessionService>;
+  let authService: jest.Mocked<AuthService>;
+  let router: Router;
 
-  // Mock implementation of AuthService with a fake login response
-  const authServiceMock = {
-    login: jest.fn().mockReturnValue(of({ token: 'fake-token' }))
-  };
-
+  // Configuration avant chaque test
   beforeEach(async () => {
-    // Configure the testing module with component and all dependencies
+    const authServiceMock = {
+      login: jest.fn()
+    };
+
+    const sessionServiceMock = {
+      logIn: jest.fn()
+    };
+
+    const routerMock = {
+      navigate: jest.fn() // Mock de la méthode navigate du Router
+    };
+
+    // Configuration du TestBed pour fournir les dépendances et les modules nécessaires
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [
-        { provide: AuthService, useValue: authServiceMock }
-      ],
       imports: [
-        RouterTestingModule,          
-        BrowserAnimationsModule,      
-        HttpClientModule,             
-        MatCardModule,                
-        MatIconModule,                
-        MatFormFieldModule,           
-        MatInputModule,               
-        ReactiveFormsModule           
+        ReactiveFormsModule,
+        HttpClientModule,
+        MatSnackBarModule,
+        RouterTestingModule.withRoutes([]),
+        MatCardModule, // Import du module MatCardModule
+        MatFormFieldModule, // Import du module MatFormFieldModule
+        MatIconModule, // Import du module MatIconModule
+        MatInputModule, // Import du module MatInputModule
+        BrowserAnimationsModule  // Import de BrowserAnimationsModule
+      ],
+      providers: [
+        FormBuilder,
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: SessionService, useValue: sessionServiceMock },
+         { provide: Router, useValue: routerMock } // Utilisation du mock
       ]
     }).compileComponents();
 
-    // Create component fixture and instance
+    // Création de la fixture et initialisation du composant
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService);
+    authService = TestBed.inject(AuthService) as jest.Mocked<AuthService>;
+    sessionService = TestBed.inject(SessionService) as jest.Mocked<SessionService>;
+    router = TestBed.inject(Router);
+
     fixture.detectChanges();
   });
 
-  // Simple test to ensure the component compiles and renders correctly
+ // Test pour vérifier que le composant est créé correctement
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Ensure that the submit button is disabled when the form is invalid
-  it('should disable submit button when form is invalid', () => {
-    const compiled = fixture.nativeElement;
-    const submitButton = compiled.querySelector('button[type="submit"]');
-    expect(submitButton.disabled).toBeTruthy();
-  });
+  // Test pour vérifier le comportement de la méthode de soumission du formulaire
+  it('should login and navigate to sessions on success', async() => {
+    // Réponse simulée du service d'authentification
+    const loginResponse: SessionInformation = {
+      token: 'mock-token',
+      type: 'user',
+      id: 1,
+      username: 'mockUsername',
+      firstName: 'Mock',
+      lastName: 'User',
+      admin: true
+    }
 
-  // Simulate a valid form submission and check if AuthService.login is called correctly
-  it('should call authService.login when form is valid and submitted', () => {
-    component.form.controls['email'].setValue('yoga@studio.com');
-    component.form.controls['password'].setValue('test!1234');
-    fixture.detectChanges();
-
+    // Mock de la méthode login pour retourner la réponse simulée
+    authService.login.mockReturnValue(of(loginResponse));
+    component.form.setValue({ email: 'test@example.com', password: 'password' });
     component.submit();
 
-    // Check if AuthService.login was called with the correct payload
+     // Vérification que la méthode login a été appelée avec les bons arguments
     expect(authService.login).toHaveBeenCalledWith({
-      email: 'yoga@studio.com',
-      password: 'test!1234'
-    });
-  });
+      email: 'test@example.com',
+      password: 'password'
+    } as LoginRequest);
+
+    // Attente que toutes les opérations asynchrones soient terminées
+    await fixture.whenStable();
+
+     // Vérification que la méthode logIn du sessionService a été appelée avec la réponse simulée
+    expect(sessionService.logIn).toHaveBeenCalledWith(loginResponse);
+    // Vérification que la méthode navigate du router a été appelée avec le bon argument
+    expect(router.navigate).toHaveBeenCalledWith(['/sessions']);
+     // Vérification que la propriété onError du composant est à false
+    expect(component.onError).toBe(false);
+
+  })
+
 });

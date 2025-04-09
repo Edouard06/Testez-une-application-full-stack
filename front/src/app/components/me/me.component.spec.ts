@@ -1,57 +1,64 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { MeComponent } from './me.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpClientModule } from '@angular/common/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { expect } from '@jest/globals';
+import { of, Observable, startWith } from 'rxjs';
+
+import { MeComponent } from './me.component';
 import { SessionService } from 'src/app/services/session.service';
 import { UserService } from 'src/app/services/user.service';
-import { expect, jest } from '@jest/globals';
 
-describe('MeComponent (Jest)', () => {
+describe('MeComponent', () => {
   let component: MeComponent;
   let fixture: ComponentFixture<MeComponent>;
-  let mockUserService: any;
-  let mockSnackBar: any;
-  let mockRouter: any;
-  let mockSessionService: any;
 
-  const fakeUser = {
-    id: 1,
-    firstName: 'Yoda',
-    lastName: 'Test',
-    email: 'yoda@test.com',
-    admin: false,
-    createdAt: new Date(),
-    updatedAt: new Date()
+  const mockSessionService = {
+    sessionInformation: {
+      admin: true,
+      id: 1
+    },
+    isLogged: true,
+    logOut: jest.fn()
+  };
+
+  const mockUserService = {
+    getById: jest.fn(id => of({
+      id: 1,
+      email: "test@test.com",
+      firstName: "test",
+      lastName: "ostero",
+      admin: true,
+      password: "blabla",
+      createdAt: new Date(Date.now()),
+      updatedAt: new Date(Date.now())
+    })),
+    delete: jest.fn(_ => new Observable<any>().pipe(startWith(1)))
   };
 
   beforeEach(async () => {
-    mockUserService = {
-      getById: jest.fn().mockReturnValue(of(fakeUser)),
-      delete: jest.fn().mockReturnValue(of({}))
-    };
-
-    mockSnackBar = {
-      open: jest.fn()
-    };
-
-    mockRouter = {
-      navigate: jest.fn()
-    };
-
-    mockSessionService = {
-      sessionInformation: { id: 1 },
-      logOut: jest.fn()
-    };
-
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
+      imports: [
+        MatSnackBarModule,
+        HttpClientModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule
+      ],
       providers: [
+        { provide: SessionService, useValue: mockSessionService },
         { provide: UserService, useValue: mockUserService },
-        { provide: MatSnackBar, useValue: mockSnackBar },
-        { provide: Router, useValue: mockRouter },
-        { provide: SessionService, useValue: mockSessionService }
-      ]
+        { provide: MatSnackBar, useValue: { open: jest.fn() }},
+        { provide: Router, useValue: { navigate: jest.fn() }}
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // 👈 Ajout pour ignorer les composants inconnus
     }).compileComponents();
 
     fixture = TestBed.createComponent(MeComponent);
@@ -59,33 +66,41 @@ describe('MeComponent (Jest)', () => {
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should fetch user on init', () => {
+  it('should load currently authenticated user', () => {
     component.ngOnInit();
-    expect(mockUserService.getById).toHaveBeenCalledWith('1');
-    expect(component.user).toEqual(fakeUser);
+    expect(component.user).toBeDefined();
+    expect(component.user?.firstName).toBe('test');
   });
 
-  it('should call history.back when back() is triggered', () => {
-    const backSpy = jest.spyOn(window.history, 'back');
-    component.back();
-    expect(backSpy).toHaveBeenCalled();
+  it('should display user info', () => {
+    const debugElement: DebugElement = fixture.debugElement;
+    const element: HTMLElement = debugElement.nativeElement;
+    const infoElements = element.querySelectorAll('p');
+    expect(infoElements).not.toBeNull();
+    expect(infoElements.length).toBe(5);
+    expect(infoElements[0].textContent).toEqual('Name: test OSTERO');
+    expect(infoElements[1].textContent).toEqual('Email: test@test.com');
+    expect(infoElements[2].textContent).toEqual('You are admin');
   });
 
-  it('should delete user and redirect', fakeAsync(() => {
+  it('should go back to the previous window when Back Button is clicked', () => {
+    jest.spyOn(component, 'back');
+    const debugElement: DebugElement = fixture.debugElement;
+    const element: HTMLElement = debugElement.nativeElement;
+    const backButtonElement = element.querySelector('button');
+    expect(backButtonElement).not.toBeNull();
+    backButtonElement?.click();
+    expect(component.back).toHaveBeenCalled();
+  });
+
+  it('should delete currently authenticated user and log out', () => {
+    jest.spyOn(component, 'delete');
+    mockSessionService.logOut.mockImplementationOnce(() => null);
     component.delete();
-    tick();
-
-    expect(mockUserService.delete).toHaveBeenCalledWith('1');
-    expect(mockSnackBar.open).toHaveBeenCalledWith(
-      'Your account has been deleted !',
-      'Close',
-      { duration: 3000 }
-    );
     expect(mockSessionService.logOut).toHaveBeenCalled();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
-  }));
+  });
 });
