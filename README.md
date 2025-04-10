@@ -48,19 +48,22 @@ Yoga App is an application that empowers users to easily subscribe or unsubscrib
 
 1. Navigate to the front-end project directory and run the command `npm run test` to execute front-end unit tests using Jest.
 2. To view the coverage report, run the command `npm run test:coverage`. 
-3. The report `index.html` will be generated in the `front/coverage/jest/lcov-report/index.html` directory.
+3. The report `index.html` will be generated in the `front/coverage/jest/lcov-report/index.html` directory.![istanbul rapport jest](https://github.com/user-attachments/assets/754f9076-4ecf-4271-8967-256e1b1ec25c)
+
 
 ### End-to-End Tests (Cypress)
 
 1. Navigate to the front-end project directory and run the command `npm run e2e` to perform end-to-end tests with Cypress.
 2. To view the coverage report, run the command `npm run e2e:coverage`. 
-3. The report `index.html` will be generated in the `front/coverage/lcov-report/index.html` directory.
+3. The report `index.html` will be generated in the `front/coverage/lcov-report/index.html` directory.![istanbul rapport e2e cy](https://github.com/user-attachments/assets/da4113d5-aa4b-4fb3-8a15-c3922bfd485a)
+
 
 ### Back-end Unit and Integration Tests (JUnit and Mockito)
 
 1. Ensure you run the provided database script in the `resources/sql` folder before executing the tests.
 2. Navigate to the back-end project directory and execute the command `mvn clean test` to run back-end unit and integration tests using JUnit and Mockito.
-3. The coverage report will be generated in the `back/target/site/jacoco/index.html` directory.
+3. The coverage report will be generated in the `back/target/site/jacoco/index.html` directory.![yoga app rapport jacoco](https://github.com/user-attachments/assets/286c034d-ac9d-4924-bfab-41141fbfa753)
+
 
 
 Ensure you have the required versions of Java, Node.js, Maven, and Angular CLI (version 14.1.0) installed to ensure compatibility with the project.
