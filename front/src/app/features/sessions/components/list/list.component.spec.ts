@@ -41,7 +41,7 @@ describe('ListComponent - Minimal', () => {
       imports: [HttpClientModule, MatCardModule, MatIconModule],
       providers: [{ provide: SessionService, useValue: mockSessionService }],
       declarations: [ListComponent],
-      schemas: [NO_ERRORS_SCHEMA] // Ignore les erreurs sur les composants inconnus.
+      schemas: [NO_ERRORS_SCHEMA] 
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListComponent);

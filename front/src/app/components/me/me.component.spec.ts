@@ -58,7 +58,7 @@ describe('MeComponent', () => {
         { provide: MatSnackBar, useValue: { open: jest.fn() }},
         { provide: Router, useValue: { navigate: jest.fn() }}
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA] // 👈 Ajout pour ignorer les composants inconnus
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MeComponent);

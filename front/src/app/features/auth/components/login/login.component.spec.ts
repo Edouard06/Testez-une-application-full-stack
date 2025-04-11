@@ -19,14 +19,14 @@ import { SessionInformation } from 'src/app/interfaces/sessionInformation.interf
 import { of } from 'rxjs/internal/observable/of';
 
 describe('LoginComponent', () => {
-  // Déclaration des variables de test
+  
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let sessionService: jest.Mocked<SessionService>;
   let authService: jest.Mocked<AuthService>;
   let router: Router;
 
-  // Configuration avant chaque test
+  
   beforeEach(async () => {
     const authServiceMock = {
       login: jest.fn()
@@ -37,10 +37,10 @@ describe('LoginComponent', () => {
     };
 
     const routerMock = {
-      navigate: jest.fn() // Mock de la méthode navigate du Router
+      navigate: jest.fn() 
     };
 
-    // Configuration du TestBed pour fournir les dépendances et les modules nécessaires
+    
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
       imports: [
@@ -48,11 +48,11 @@ describe('LoginComponent', () => {
         HttpClientModule,
         MatSnackBarModule,
         RouterTestingModule.withRoutes([]),
-        MatCardModule, // Import du module MatCardModule
-        MatFormFieldModule, // Import du module MatFormFieldModule
-        MatIconModule, // Import du module MatIconModule
-        MatInputModule, // Import du module MatInputModule
-        BrowserAnimationsModule  // Import de BrowserAnimationsModule
+        MatCardModule, 
+        MatFormFieldModule, 
+        MatIconModule, 
+        MatInputModule, 
+        BrowserAnimationsModule 
       ],
       providers: [
         FormBuilder,
@@ -62,7 +62,7 @@ describe('LoginComponent', () => {
       ]
     }).compileComponents();
 
-    // Création de la fixture et initialisation du composant
+   
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService) as jest.Mocked<AuthService>;
@@ -72,14 +72,11 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
- // Test pour vérifier que le composant est créé correctement
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test pour vérifier le comportement de la méthode de soumission du formulaire
   it('should login and navigate to sessions on success', async() => {
-    // Réponse simulée du service d'authentification
     const loginResponse: SessionInformation = {
       token: 'mock-token',
       type: 'user',
@@ -90,25 +87,19 @@ describe('LoginComponent', () => {
       admin: true
     }
 
-    // Mock de la méthode login pour retourner la réponse simulée
     authService.login.mockReturnValue(of(loginResponse));
     component.form.setValue({ email: 'test@example.com', password: 'password' });
     component.submit();
 
-     // Vérification que la méthode login a été appelée avec les bons arguments
     expect(authService.login).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: 'password'
     } as LoginRequest);
 
-    // Attente que toutes les opérations asynchrones soient terminées
     await fixture.whenStable();
 
-     // Vérification que la méthode logIn du sessionService a été appelée avec la réponse simulée
     expect(sessionService.logIn).toHaveBeenCalledWith(loginResponse);
-    // Vérification que la méthode navigate du router a été appelée avec le bon argument
     expect(router.navigate).toHaveBeenCalledWith(['/sessions']);
-     // Vérification que la propriété onError du composant est à false
     expect(component.onError).toBe(false);
 
   })
